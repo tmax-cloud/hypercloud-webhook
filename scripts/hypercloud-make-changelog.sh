@@ -43,9 +43,6 @@ git log v$prev_version..HEAD --no-merges --oneline --format="  - %s by %cN" --gr
 echo -e "\n### Fixed" >> $output
 git log v$prev_version..HEAD --no-merges --oneline --format="  - %s by %cN" --grep="^\[ims\]\[[0-9]*\].*" -i >> $output
 
-echo -e "\n### CRD yaml" >> $output
-git log v$prev_version..HEAD --no-merges --oneline --format="  - %s by %cN" --grep="^\[crd\].*" -i >> $output
-
 echo -e "\n### Etc" >> $output
 git log v$prev_version..HEAD --no-merges --oneline --format="  - %s by %cN" --grep="^\[etc\].*" -i >> $output
 
