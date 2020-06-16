@@ -47,7 +47,6 @@ public class ValidatingHandler extends GeneralHandler {
 		else
 			namespace = requestObject.get("namespace").getAsString();
 		
-		
 		logger.info("Request namespace: " + namespace);
 		logger.info("Request resource: " + requestResource);
 		logger.info("Request resource name: " + resourceName);

@@ -57,9 +57,7 @@ public class MutatingHandler extends GeneralHandler {
 		String operation = requestObject.get("operation").getAsString();
 		String userName = requestObject.get("userInfo").getAsJsonObject().get("username").getAsString();
 		String namespace = null;
-		
-		logger.info("Request body: \n" + requestBody);
-		
+
 		if (!requestObject.has("namespace"))
 			namespace = "Cluster-scoped resource.";
 		else
