@@ -52,12 +52,19 @@ public class MutatingHandler extends GeneralHandler {
 		JsonObject requestBody = JsonParser.parseString(body.get("postData")).getAsJsonObject();
 		JsonObject requestObject =  requestBody.get("request").getAsJsonObject();
 		String uID = requestObject.get("uid").getAsString();
-		String namespace = requestObject.get("namespace").getAsString();
 		String requestResource = requestObject.get("resource").getAsJsonObject().get("resource").getAsString();
 		String resourceName = requestObject.get("name").getAsString();
 		String operation = requestObject.get("operation").getAsString();
 		String userName = requestObject.get("userInfo").getAsJsonObject().get("username").getAsString();
-
+		String namespace = null;
+		
+		logger.info("Request body: \n" + requestBody);
+		
+		if (!requestObject.has("namespace"))
+			namespace = "Cluster-scoped resource.";
+		else
+			namespace = requestObject.get("namespace").getAsString();
+		
 		JsonObject responseBody = null;
 
 		logger.info("Request namespace: " + namespace);
