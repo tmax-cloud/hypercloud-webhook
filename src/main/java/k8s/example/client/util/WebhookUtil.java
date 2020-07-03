@@ -5,8 +5,8 @@ import com.google.gson.JsonObject;
 import fi.iki.elonen.NanoHTTPD.Response;
 
 public class WebhookUtil {
-	public static final String ADMISSION_REVIEW_VERSION = "admission.k8s.io/v1";
-	    
+	public static final String ADMISSION_REVIEW_VERSION = "admission.k8s.io/v1beta1";
+	
     public static JsonObject buildAdmissionReview (String uID, boolean allowd, String jsonPatchB64, int code, String message) {
 		// Build AdmissionReview 
     	JsonObject admissionReview = new JsonObject();
