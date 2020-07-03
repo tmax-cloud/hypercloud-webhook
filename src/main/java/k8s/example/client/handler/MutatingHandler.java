@@ -53,7 +53,7 @@ public class MutatingHandler extends GeneralHandler {
 		JsonObject requestObject =  requestBody.get("request").getAsJsonObject();
 		String uID = requestObject.get("uid").getAsString();
 		String requestResource = requestObject.get("resource").getAsJsonObject().get("resource").getAsString();
-		String resourceName = requestObject.get("name").getAsString();
+		//String resourceName = requestObject.get("name").getAsString();
 		String operation = requestObject.get("operation").getAsString();
 		String userName = requestObject.get("userInfo").getAsJsonObject().get("username").getAsString();
 		String namespace = null;
@@ -67,7 +67,7 @@ public class MutatingHandler extends GeneralHandler {
 
 		logger.info("Request namespace: " + namespace);
 		logger.info("Request resource: " + requestResource);
-		logger.info("Request resource name: " + resourceName);
+		//logger.info("Request resource name: " + resourceName);
 		logger.info("Request operation: " + operation);
 		logger.info("Request user: " + userName);		
 		logger.info("Request body: \n" + requestBody);
