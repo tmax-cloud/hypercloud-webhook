@@ -1,6 +1,21 @@
 # HyperCloudWebhookServer changelog!!
 All notable changes to this project will be documented in this file.
 
+<!-------------------- v4.1.0.6 start -------------------->
+
+## HyperCloudWebhookServer_4.1.0.6 (Tue Jul  7 16:42:43 KST 2020)
+
+### Added
+
+### Changed
+  - [mod] disable the parsing logic of the resource name in Validation by gyeongyeol-choi
+
+### Fixed
+
+### Etc
+
+<!--------------------- v4.1.0.6 end --------------------->
+
 <!-------------------- v4.1.0.5 start -------------------->
 
 ## HyperCloudWebhookServer_4.1.0.5 (Fri Jul  3 18:08:44 KST 2020)
