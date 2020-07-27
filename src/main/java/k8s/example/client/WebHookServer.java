@@ -19,7 +19,7 @@ public class WebHookServer extends RouterNanoHTTPD {
     
     public WebHookServer() throws IOException {
         super(8080);
-		char[] password = "tmax@23".toCharArray();
+		char[] password = "test".toCharArray();
 		KeyStore ks = null;
 		KeyManagerFactory kmf = null;
 		try {
