@@ -3,9 +3,9 @@ package k8s.example.client.util;
 import com.google.gson.JsonObject;
 
 import fi.iki.elonen.NanoHTTPD.Response;
+import k8s.example.client.Constants;
 
 public class WebhookUtil {
-	public static final String ADMISSION_REVIEW_VERSION = "admission.k8s.io/v1beta1";
 	
     public static JsonObject buildAdmissionReview (String uID, boolean allowd, String jsonPatchB64, int code, String message) {
 		// Build AdmissionReview 
@@ -13,7 +13,7 @@ public class WebhookUtil {
     	JsonObject responseObject = new JsonObject();
     	JsonObject statusObject = new JsonObject();
     	
-    	admissionReview.addProperty("apiVersion", ADMISSION_REVIEW_VERSION);
+    	admissionReview.addProperty("apiVersion", Constants.ADMISSION_REVIEW_VERSION);
     	admissionReview.addProperty("kind", "AdmissionReview");
     	
     	if (jsonPatchB64 != null) {

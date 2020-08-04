@@ -3,7 +3,7 @@ package k8s.example.client;
 public class Constants {
 	
 	// MutatingHandler,ValidatingHandler
-	public static final String ADMISSION_REVIEW_VERSION = "admission.k8s.io/v1";
+	public static final String ADMISSION_REVIEW_VERSION = "admission.k8s.io/v1beta1";
 	public static final String ANNOTATION_PATH_CREATOR = "/metadata/annotations/creator";
 	public static final String ANNOTATION_PATH_UPDATER = "/metadata/annotations/updater";
 	public static final String ANNOTATION_PATH_CREATEDTIME = "/metadata/annotations/createdTime";
