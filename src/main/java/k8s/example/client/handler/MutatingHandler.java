@@ -40,6 +40,15 @@ public class MutatingHandler extends GeneralHandler {
 	
     public Response post(UriResource uriResource, Map<String, String> urlParams, IHTTPSession session) {
     	
+    	JsonObject requestBody = null;
+    	JsonObject requestObject = null;
+    	String uID = null;
+    	String requestResource = null;
+    	String operation = null;
+    	String userName = null; 
+    	String namespace = null;
+		JsonObject responseBody = null;
+		
     	logger.info("Start Mutating");
 		Map<String, String> body = new HashMap<String, String>();
 		try {
@@ -49,21 +58,25 @@ public class MutatingHandler extends GeneralHandler {
 		}
 		
 		// Parse input request body
-		JsonObject requestBody = JsonParser.parseString(body.get("postData")).getAsJsonObject();
-		JsonObject requestObject =  requestBody.get("request").getAsJsonObject();
-		String uID = requestObject.get("uid").getAsString();
-		String requestResource = requestObject.get("resource").getAsJsonObject().get("resource").getAsString();
-		//String resourceName = requestObject.get("name").getAsString();
-		String operation = requestObject.get("operation").getAsString();
-		String userName = requestObject.get("userInfo").getAsJsonObject().get("username").getAsString();
-		String namespace = null;
+		try {
+			requestBody = JsonParser.parseString(body.get("postData")).getAsJsonObject();
+			requestObject =  requestBody.get("request").getAsJsonObject();
+			uID = requestObject.get("uid").getAsString();
+			requestResource = requestObject.get("resource").getAsJsonObject().get("resource").getAsString();
+			//String resourceName = requestObject.get("name").getAsString();
+			operation = requestObject.get("operation").getAsString();
+			userName = requestObject.get("userInfo").getAsJsonObject().get("username").getAsString();
+		} catch (Exception e) {
+			logger.info("Fail to parse input json.");
+			logger.info("Request body: \n" + requestBody);
+			responseBody = WebhookUtil.buildAdmissionReview(uID, false, null, 403, "Fail to parse input json.");
+			return WebhookUtil.setCors(NanoHTTPD.newFixedLengthResponse(Status.OK, "application/json", responseBody.toString()));
+		}
 
 		if (!requestObject.has("namespace"))
 			namespace = "Cluster-scoped resource.";
 		else
 			namespace = requestObject.get("namespace").getAsString();
-		
-		JsonObject responseBody = null;
 
 		logger.info("Request namespace: " + namespace);
 		logger.info("Request resource: " + requestResource);
