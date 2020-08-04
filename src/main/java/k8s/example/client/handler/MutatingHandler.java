@@ -48,6 +48,7 @@ public class MutatingHandler extends GeneralHandler {
     	String userName = null; 
     	String namespace = null;
 		JsonObject responseBody = null;
+		String resourceName = null;
 		
     	logger.info("Start Mutating");
 		Map<String, String> body = new HashMap<String, String>();
@@ -63,7 +64,6 @@ public class MutatingHandler extends GeneralHandler {
 			requestObject =  requestBody.get("request").getAsJsonObject();
 			uID = requestObject.get("uid").getAsString();
 			requestResource = requestObject.get("resource").getAsJsonObject().get("resource").getAsString();
-			//String resourceName = requestObject.get("name").getAsString();
 			operation = requestObject.get("operation").getAsString();
 			userName = requestObject.get("userInfo").getAsJsonObject().get("username").getAsString();
 		} catch (Exception e) {
@@ -73,17 +73,21 @@ public class MutatingHandler extends GeneralHandler {
 			return WebhookUtil.setCors(NanoHTTPD.newFixedLengthResponse(Status.OK, "application/json", responseBody.toString()));
 		}
 
-		if (!requestObject.has("namespace"))
-			namespace = "Cluster-scoped resource.";
-		else
+		if (requestObject.has("namespace"))
 			namespace = requestObject.get("namespace").getAsString();
+		else
+			namespace = "Cluster-scoped resource.";	
+		
+		if (requestObject.has("name"))
+			resourceName = requestObject.get("name").getAsString();
+		else
+			resourceName = "";
 
 		logger.info("Request namespace: " + namespace);
 		logger.info("Request resource: " + requestResource);
-		//logger.info("Request resource name: " + resourceName);
+		logger.info("Request resource name: " + resourceName);
 		logger.info("Request operation: " + operation);
 		logger.info("Request user: " + userName);		
-		logger.info("Request body: \n" + requestBody);
     	
     	//Exception for all user action..
 		if (denyRequest(userName, operation, requestObject)) {
