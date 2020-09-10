@@ -31,13 +31,15 @@ public class AuditDataFactory {
 			Class.forName(Constants.JDBC_DRIVER);
 			conn = DriverManager.getConnection(Constants.DB_URL, Constants.USERNAME, System.getenv("DB_PASSWORD"));
 			conn.setAutoCommit(false);
+
 		} catch(Exception e) {
 			logger.error("Failed to get connection, check stack trace: \n" + Util.printExceptionError(e));
 		}
 	}
 	
 	private static final String AUDIT_INSERT_QUERY = "insert into metering.audit values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-	private static final String AUDIT_SELECT_QUERY = "select * from metering.audit where 1=1 ";
+	private static final String AUDIT_SELECT_QUERY = "select SQL_CALC_FOUND_ROWS * from metering.audit where 1=1 ";
+	private static final String AUDIT_SELECT_CNT_QUERY = "select FOUND_ROWS()";
 	
 	public static void insert(List<Event> eventList) throws Exception {
 		int i = 1;
@@ -62,12 +64,11 @@ public class AuditDataFactory {
 				pstmt.setString(i++, responseStatus == null ? "" : responseStatus.getReason());
 				pstmt.setString(i++, responseStatus == null ? "" : responseStatus.getMessage());
 										
-				logger.info("Query=\"" + pstmt.getQueryString() + "\"");
+				logger.debug("Query=\"" + pstmt.getQueryString() + "\"");
 				pstmt.addBatch();
 			}
 			int[] result = pstmt.executeBatch();
 			conn.commit();
-			logger.info("Insert audit data success, dataCnt=" + result.length);
 		}
 	}
 	
@@ -78,13 +79,17 @@ public class AuditDataFactory {
 		String endTime = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_ENDTIME);
 		String namespace = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_NAMESPACE);
 		List<String> sort = SimpleUtil.getQueryParameterArray(query, Constants.QUERY_PARAMETER_SORT);
+		String resource = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_RESOURCE);
+		String code = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_CODE);
 		query.remove(Constants.QUERY_PARAMETER_OFFSET);
 		query.remove(Constants.QUERY_PARAMETER_LIMIT);
 		query.remove(Constants.QUERY_PARAMETER_STARTTIME);
 		query.remove(Constants.QUERY_PARAMETER_ENDTIME);
 		query.remove(Constants.QUERY_PARAMETER_NAMESPACE);
 		query.remove(Constants.QUERY_PARAMETER_SORT);
-		
+		query.remove(Constants.QUERY_PARAMETER_RESOURCE);
+		query.remove(Constants.QUERY_PARAMETER_CODE);
+
 		
 		StringBuilder sb = new StringBuilder(AUDIT_SELECT_QUERY);
 		query.forEach((key, value) -> sb.append("and ").append(key).append(" like '%").append(value.get(0)).append("%' "));
@@ -95,6 +100,17 @@ public class AuditDataFactory {
 		
 		if(StringUtil.isNotEmpty(namespace)) {
 			sb.append("and namespace = '").append(namespace).append("' ");
+		}
+		
+		if(StringUtil.isNotEmpty(resource)) {
+			sb.append("and resource = '").append(resource).append("' ");
+		}
+		
+		if(StringUtil.isNotEmpty(code)) {
+			 int codeInt = Integer.parseInt(code);
+			 int lowerBound = (codeInt / 100) * 100;
+			 int upperBound = lowerBound + 99;
+			 sb.append("and code between '").append(lowerBound).append("' and '").append(upperBound).append("' ");
 		}
 		
 		if(sort != null && sort.size() > 0){
@@ -118,6 +134,7 @@ public class AuditDataFactory {
 		} else {
 			sb.append("limit 100 ");
 		}
+		
 		if(StringUtil.isNotEmpty(offset)) {
 			sb.append("offset ").append(offset);
 		} else {
@@ -126,7 +143,7 @@ public class AuditDataFactory {
 		
 		List<Event> result = new ArrayList<>();
 		try(LogPreparedStatement pstmt = new LogPreparedStatement(conn, sb.toString())){
-			logger.info("Query=\"" + pstmt.getQueryString() + "\"");
+			logger.debug("Query=\"" + pstmt.getQueryString() + "\"");
 			try(ResultSet rs = pstmt.executeQuery()) {
 				while(rs.next()) {
 					Event event = new Event();
@@ -150,6 +167,20 @@ public class AuditDataFactory {
 					event.getResponseStatus().setMessage(rs.getString("message"));
 					result.add(event);
 				}
+			}
+		}
+		return result;
+	}
+	
+	public static long selectCnt () throws Exception {
+		StringBuilder sb = new StringBuilder(AUDIT_SELECT_CNT_QUERY);
+		long result;
+		
+		try(LogPreparedStatement pstmt = new LogPreparedStatement(conn, sb.toString())){
+			logger.debug("Query=\"" + pstmt.getQueryString() + "\"");
+			try(ResultSet rs = pstmt.executeQuery()) {
+				rs.next();
+				result = rs.getLong("FOUND_ROWS()");
 			}
 		}
 		return result;

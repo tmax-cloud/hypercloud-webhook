@@ -101,7 +101,5 @@ public class AuditController {
 		} catch(Exception e) {
 			logger.error("Failed to record user activity, verb=\"" + verb + ", username=\"" + username + "\"\n" + Util.printExceptionError(e));
 		}
-		
 	}
-
 }
