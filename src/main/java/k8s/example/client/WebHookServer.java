@@ -39,7 +39,7 @@ public class WebHookServer extends RouterNanoHTTPD {
   
     @Override
     public void addMappings() {
-    	addRoute("/audit", AuditHandler.class);
+    	addRoute("/api/webhook/audit", AuditHandler.class);
     	addRoute("/mutate", MutatingHandler.class);
     	addRoute("/validate", ValidatingHandler.class);
     }
