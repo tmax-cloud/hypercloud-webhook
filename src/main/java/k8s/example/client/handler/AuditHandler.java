@@ -68,6 +68,7 @@ public class AuditHandler extends GeneralHandler{
 			outdto.setKind("EventList");
 			outdto.setApiVersion("audit.k8s.io/v1");
 			outdto.setItems(AuditDataFactory.select(session.getParameters()));
+			outdto.setTotalNum(AuditDataFactory.selectCnt());
 		} catch (Exception e) {
 			logger.error("Failed to get event data. \n" + Util.printExceptionError(e));
 			return NanoHTTPD.newFixedLengthResponse(Status.INTERNAL_ERROR, getMimeType(), "Failed to put data on the queue.");
