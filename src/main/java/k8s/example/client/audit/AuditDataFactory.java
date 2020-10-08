@@ -172,7 +172,7 @@ public class AuditDataFactory {
 		return result;
 	}
 	
-	public static long selectCnt () throws Exception {
+	public static long selectCnt() throws Exception {
 		StringBuilder sb = new StringBuilder(AUDIT_SELECT_CNT_QUERY);
 		long result;
 		

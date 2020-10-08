@@ -30,6 +30,7 @@ public class WebHookServer extends RouterNanoHTTPD {
 			kmf.init(ks, password);
 		} catch(Exception e) {
 			e.printStackTrace();
+			logger.error(Util.printExceptionError(e));
 		}
 	    makeSecure(NanoHTTPD.makeSSLSocketFactory(ks, kmf), null);
         addMappings();
