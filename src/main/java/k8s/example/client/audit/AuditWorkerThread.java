@@ -27,7 +27,9 @@ public class AuditWorkerThread extends Thread {
 			while(true) {
 				List<Event> eventList = queue.takeAll();
 				for(Event event: eventList) {
-
+					if (event.getObjectRef().getResource().equalsIgnoreCase("pods") && event.getObjectRef().getName() == null) {						
+						event.getObjectRef().setName(event.getResponseObject().getMetadata().getName());
+					}
 					ResponseStatus responseStatus = event.getResponseStatus();
 				 	if((responseStatus.getCode() / 100) == 2  && responseStatus.getStatus() == null) {
 				 		responseStatus.setStatus("Success");

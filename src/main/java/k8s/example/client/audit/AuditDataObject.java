@@ -87,6 +87,30 @@ public class AuditDataObject {
 	}
 	
 	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class MetadataObject {
+		private String name;
+
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getName() {
+			return name;
+		}
+	}
+	
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public static class ResponseObject {
+		private MetadataObject metadata;
+		
+		public MetadataObject getMetadata() {
+			return metadata;
+		}
+		public void setItems(MetadataObject metadata) {
+			this.metadata = metadata;
+		}
+	}
+	
+	@JsonIgnoreProperties(ignoreUnknown = true)
 	public static class EventList {
 		private String kind;
 		private String apiVersion;
@@ -132,6 +156,7 @@ public class AuditDataObject {
 		private String userAgent;
 		private ObjectReference objectRef;
 		private ResponseStatus responseStatus;
+		private ResponseObject responseObject;
 		private DateTime requestReceivedTimestamp;
 		private DateTime stageTimestamp;
 		private Map<String, String> annotations;
@@ -195,6 +220,12 @@ public class AuditDataObject {
 		}
 		public void setResponseStatus(ResponseStatus responseStatus) {
 			this.responseStatus = responseStatus;
+		}
+		public ResponseObject getResponseObject() {
+			return responseObject;
+		}
+		public void setResponseObject(ResponseObject responseObject) {
+			this.responseObject = responseObject;
 		}
 		public DateTime getRequestReceivedTimestamp() {
 			return requestReceivedTimestamp;
