@@ -20,6 +20,7 @@ public class Main {
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error(Util.printExceptionError(e));
 		}
 	}
 }
