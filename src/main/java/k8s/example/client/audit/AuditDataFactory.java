@@ -81,6 +81,7 @@ public class AuditDataFactory {
 		List<String> sort = SimpleUtil.getQueryParameterArray(query, Constants.QUERY_PARAMETER_SORT);
 		String resource = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_RESOURCE);
 		String code = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_CODE);
+		String verb = SimpleUtil.getQueryParameter(query, Constants.QUERY_PARAMETER_ACTION);
 		query.remove(Constants.QUERY_PARAMETER_OFFSET);
 		query.remove(Constants.QUERY_PARAMETER_LIMIT);
 		query.remove(Constants.QUERY_PARAMETER_STARTTIME);
@@ -89,6 +90,7 @@ public class AuditDataFactory {
 		query.remove(Constants.QUERY_PARAMETER_SORT);
 		query.remove(Constants.QUERY_PARAMETER_RESOURCE);
 		query.remove(Constants.QUERY_PARAMETER_CODE);
+		query.remove(Constants.QUERY_PARAMETER_ACTION);
 
 		
 		StringBuilder sb = new StringBuilder(AUDIT_SELECT_QUERY);
@@ -104,6 +106,10 @@ public class AuditDataFactory {
 		
 		if(StringUtil.isNotEmpty(resource)) {
 			sb.append("and resource = '").append(resource).append("' ");
+		}
+		
+		if(StringUtil.isNotEmpty(verb)) {
+			sb.append("and verb = '").append(verb).append("' ");
 		}
 		
 		if(StringUtil.isNotEmpty(code)) {
