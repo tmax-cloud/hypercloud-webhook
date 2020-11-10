@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secrets
+  namespace: hypercloud4-system
+type: Opaque
+data:
+  ROOT_PASSWORD: dG1heA==
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+  namespace: hypercloud4-system
+data:
+  initdb.sql: |
+    create table metering.audit (id varchar(40) not null, username varchar(255), useragent varchar(255), namespace varchar(255), apigroup varchar(255), apiversion varchar(32), resource varchar(64), name varchar(255), stage varchar(32), stagetimestamp timestamp not null, verb varchar(32), code int, status varchar(255), reason varchar(255), message varchar(255));
+    
+    
+

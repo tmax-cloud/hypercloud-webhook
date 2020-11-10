@@ -1,0 +1,52 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: hypercloud4-mutator
+webhooks:
+  - name: hypercloud4-webhook-svc.hypercloud4-system.svc
+    clientConfig:
+      service:
+        name: hypercloud4-webhook-svc
+        namespace: hypercloud4-system
+        path: "/metadata"
+        port: 443
+      caBundle: ${HYPERCLOUD4_CA_CERT}
+    rules:
+      - operations: ["CREATE","UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["configmaps"]
+    matchPolicy: Equivalent
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1"]
+    timeoutSeconds: 10
+    namespaceSelector:
+      matchExpressions:
+      - key: webhook
+        operator: NotIn 
+        values: ["false"]
+    failurePolicy: Fail
+  - name: hypercloud4-webhook-svc.hypercloud4-system.svc
+    clientConfig:
+      service:
+        name: hypercloud4-webhook-svc
+        namespace: hypercloud4-system
+        path: "/injection"
+        port: 443 
+      caBundle: ${HYPERCLOUD4_CA_CERT}
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    matchPolicy: Equivalent
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1"]
+    timeoutSeconds: 10
+    namespaceSelector:
+      matchExpressions:
+      - key: webhook
+        operator: NotIn 
+        values: ["false"]
+    failurePolicy: Fail
+

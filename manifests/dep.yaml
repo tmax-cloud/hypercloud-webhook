@@ -1,0 +1,185 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "3"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"nginx-deployment"},"name":"nginx-deployment","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"nginx-deployment"}},"template":{"metadata":{"labels":{"app":"nginx-deployment","log_collector_injection":"enabled"}},"spec":{"containers":[{"image":"nginx:1.14.2","name":"nginx","ports":[{"containerPort":12345}],"volumeMounts":[{"mountPath":"/shared","name":"shared"}]}],"volumes":[{"hostPath":{"path":"/mnt/test"},"name":"shared"}]}}}}
+    creationTimestamp: "2020-11-09T12:16:06Z"
+    generation: 3
+    labels:
+      app: nginx-deployment
+    name: nginx-deployment
+    namespace: default
+    ownerReferences:
+    - apiVersion: log.tmax.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Log
+      name: log-sample
+      uid: 149492f1-7575-490e-9a74-9f0654fab872
+    resourceVersion: "12008828"
+    selfLink: /apis/apps/v1/namespaces/default/deployments/nginx-deployment
+    uid: dec208d0-08ce-4acf-95bb-b634bf066ca4
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: nginx-deployment
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          tmax.io/configMap: '{"kind":"ConfigMap","apiVersion":"v1","metadata":{"name":"log-sample","namespace":"default","selfLink":"/api/v1/namespaces/default/configmaps/log-sample","uid":"8d07a81c-de07-4a36-8c09-6a15c8388999","resourceVersion":"12008722","creationTimestamp":"2020-11-09T11:23:42Z","annotations":{"createdTime":"2020-11-09T20:23:42.055298014+09:00","creator":"system:serviceaccount:default:default","updatedTime":"2020-11-09T20:23:42.055298014+09:00","updater":"system:serviceaccount:default:default"},"ownerReferences":[{"apiVersion":"log.tmax.io/v1","kind":"Log","name":"log-sample","uid":"149492f1-7575-490e-9a74-9f0654fab872","controller":true,"blockOwnerDeletion":true}]},"data":{"test":"test2"}}'
+          tmax.io/sharedVolumeName: shared
+        creationTimestamp: null
+        labels:
+          app: nginx-deployment
+          log_collector_injection: enabled
+      spec:
+        containers:
+        - image: nginx:1.14.2
+          imagePullPolicy: IfNotPresent
+          name: nginx
+          ports:
+          - containerPort: 12345
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /shared
+            name: shared
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /mnt/test
+            type: ""
+          name: shared
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2020-11-09T12:16:19Z"
+      lastUpdateTime: "2020-11-09T12:16:19Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2020-11-09T12:16:06Z"
+      lastUpdateTime: "2020-11-09T12:18:21Z"
+      message: ReplicaSet "nginx-deployment-5c97d4486b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 3
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"control-plane":"controller-manager"},"name":"test-operator-controller-manager","namespace":"default"},"spec":{"replicas":1,"selector":{"matchLabels":{"control-plane":"controller-manager"}},"template":{"metadata":{"labels":{"control-plane":"controller-manager"}},"spec":{"containers":[{"args":["--secure-listen-address=0.0.0.0:8443","--upstream=http://127.0.0.1:8080/","--logtostderr=true","--v=10"],"image":"gcr.io/kubebuilder/kube-rbac-proxy:v0.5.0","name":"kube-rbac-proxy","ports":[{"containerPort":8443,"name":"https"}]},{"args":["--metrics-addr=127.0.0.1:8080","--enable-leader-election"],"command":["/manager"],"image":"os:v1","name":"manager","resources":{"limits":{"cpu":"100m","memory":"30Mi"},"requests":{"cpu":"100m","memory":"20Mi"}}}],"terminationGracePeriodSeconds":10}}}}
+    creationTimestamp: "2020-11-09T11:22:10Z"
+    generation: 1
+    labels:
+      control-plane: controller-manager
+    name: test-operator-controller-manager
+    namespace: default
+    resourceVersion: "11999338"
+    selfLink: /apis/apps/v1/namespaces/default/deployments/test-operator-controller-manager
+    uid: b658792d-d8f3-4e05-92ae-873523ab98e6
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        control-plane: controller-manager
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          control-plane: controller-manager
+      spec:
+        containers:
+        - args:
+          - --secure-listen-address=0.0.0.0:8443
+          - --upstream=http://127.0.0.1:8080/
+          - --logtostderr=true
+          - --v=10
+          image: gcr.io/kubebuilder/kube-rbac-proxy:v0.5.0
+          imagePullPolicy: IfNotPresent
+          name: kube-rbac-proxy
+          ports:
+          - containerPort: 8443
+            name: https
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        - args:
+          - --metrics-addr=127.0.0.1:8080
+          - --enable-leader-election
+          command:
+          - /manager
+          image: os:v1
+          imagePullPolicy: IfNotPresent
+          name: manager
+          resources:
+            limits:
+              cpu: 100m
+              memory: 30Mi
+            requests:
+              cpu: 100m
+              memory: 20Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 10
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2020-11-09T11:22:12Z"
+      lastUpdateTime: "2020-11-09T11:22:12Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2020-11-09T11:22:10Z"
+      lastUpdateTime: "2020-11-09T11:22:12Z"
+      message: ReplicaSet "test-operator-controller-manager-569fbc9d5c" has successfully
+        progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
