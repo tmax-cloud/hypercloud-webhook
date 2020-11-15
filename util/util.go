@@ -23,10 +23,27 @@ func CreatePatch(po *[]PatchOps, o, p string, v interface{}) {
 }
 
 func ToAdmissionResponse(err error) *v1beta1.AdmissionResponse {
+
+	if err != nil {
+		return &v1beta1.AdmissionResponse{
+			Allowed: false,
+			Result: &metav1.Status{
+				Message: err.Error(),
+			},
+		}
+	} else {
+		return &v1beta1.AdmissionResponse{
+			Allowed: true,
+			Result: &metav1.Status{
+				Message: "Pass this mutating webhook.",
+			},
+		}
+	}
+}
+
+func ToAdmissionResponse2() *v1beta1.AdmissionResponse {
 	return &v1beta1.AdmissionResponse{
-		Result: &metav1.Status{
-			Message: err.Error(),
-		},
+		Allowed: true,
 	}
 }
 

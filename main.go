@@ -132,7 +132,7 @@ func main() {
 	mux.HandleFunc("/api/webhook/audit", serveAudit)
 	mux.HandleFunc("/api/webhook/audit/batch", serveAuditBatch)
 	mux.HandleFunc("/api/webhook/audit/websocket", serveAuditWss)
-	mux.HandleFunc("/api/webhook/injection", serveSidecarInjection)
+	mux.HandleFunc("/api/webhook/inject", serveSidecarInjection)
 	mux.HandleFunc("/api/webhook/test", serveTest)
 
 	whsvr := &http.Server{
