@@ -3,49 +3,7 @@ package util
 import (
 	"encoding/json"
 	"net/http"
-
-	"k8s.io/api/admission/v1beta1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-type PatchOps struct {
-	Op    string      `json:"op"`
-	Path  string      `json:"path"`
-	Value interface{} `json:"value,omitempty"`
-}
-
-func CreatePatch(po *[]PatchOps, o, p string, v interface{}) {
-	*po = append(*po, PatchOps{
-		Op:    o,
-		Path:  p,
-		Value: v,
-	})
-}
-
-func ToAdmissionResponse(err error) *v1beta1.AdmissionResponse {
-
-	if err != nil {
-		return &v1beta1.AdmissionResponse{
-			Allowed: false,
-			Result: &metav1.Status{
-				Message: err.Error(),
-			},
-		}
-	} else {
-		return &v1beta1.AdmissionResponse{
-			Allowed: true,
-			Result: &metav1.Status{
-				Message: "Pass this mutating webhook.",
-			},
-		}
-	}
-}
-
-func ToAdmissionResponse2() *v1beta1.AdmissionResponse {
-	return &v1beta1.AdmissionResponse{
-		Allowed: true,
-	}
-}
 
 func Contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))

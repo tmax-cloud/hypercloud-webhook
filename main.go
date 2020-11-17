@@ -18,7 +18,6 @@ import (
 
 	admission "hypercloud4-webhook/admission"
 	audit "hypercloud4-webhook/audit"
-	util "hypercloud4-webhook/util"
 )
 
 type admitFunc func(v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
@@ -43,7 +42,7 @@ func serve(w http.ResponseWriter, r *http.Request, admit admitFunc) {
 
 	if err := json.Unmarshal(body, &requestedAdmissionReview); err != nil {
 		klog.Error(err)
-		responseAdmissionReview.Response = util.ToAdmissionResponse(err)
+		responseAdmissionReview.Response = admission.ToAdmissionResponse(err)
 	} else {
 		responseAdmissionReview.Response = admit(requestedAdmissionReview)
 	}
@@ -56,22 +55,17 @@ func serve(w http.ResponseWriter, r *http.Request, admit admitFunc) {
 
 	if err != nil {
 		klog.Error(err)
-		responseAdmissionReview.Response = util.ToAdmissionResponse(err)
+		responseAdmissionReview.Response = admission.ToAdmissionResponse(err)
 	}
 	if _, err := w.Write(respBytes); err != nil {
 		klog.Error(err)
-		responseAdmissionReview.Response = util.ToAdmissionResponse(err)
+		responseAdmissionReview.Response = admission.ToAdmissionResponse(err)
 	}
 }
 
 func serveMetadata(w http.ResponseWriter, r *http.Request) {
 	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
 	serve(w, r, admission.AddResourceMeta)
-}
-
-func serveSidecarInjection(w http.ResponseWriter, r *http.Request) {
-	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
-	serve(w, r, admission.SidecarInjection)
 }
 
 func serveAudit(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +90,39 @@ func serveAuditBatch(w http.ResponseWriter, r *http.Request) {
 func serveAuditWss(w http.ResponseWriter, r *http.Request) {
 	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
 	audit.ServeWss(w, r)
+}
+
+func serveSidecarInjectionForPod(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForPod)
+}
+func serveSidecarInjectionForDeploy(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForDeploy)
+}
+func serveSidecarInjectionForRs(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForRs)
+}
+func serveSidecarInjectionForSts(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForSts)
+}
+func serveSidecarInjectionForDs(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForDs)
+}
+func serveSidecarInjectionForCj(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForCj)
+}
+func serveSidecarInjectionForJob(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForJob)
+}
+func serveSidecarInjectionForTest(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	serve(w, r, admission.InjectionForTest)
 }
 
 func serveTest(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +159,14 @@ func main() {
 	mux.HandleFunc("/api/webhook/audit", serveAudit)
 	mux.HandleFunc("/api/webhook/audit/batch", serveAuditBatch)
 	mux.HandleFunc("/api/webhook/audit/websocket", serveAuditWss)
-	mux.HandleFunc("/api/webhook/inject", serveSidecarInjection)
+	mux.HandleFunc("/api/webhook/inject/pod", serveSidecarInjectionForPod)
+	mux.HandleFunc("/api/webhook/inject/deployment", serveSidecarInjectionForDeploy)
+	mux.HandleFunc("/api/webhook/inject/replicaset", serveSidecarInjectionForRs)
+	mux.HandleFunc("/api/webhook/inject/statefulset", serveSidecarInjectionForSts)
+	mux.HandleFunc("/api/webhook/inject/daemonset", serveSidecarInjectionForDs)
+	mux.HandleFunc("/api/webhook/inject/cronjob", serveSidecarInjectionForCj)
+	mux.HandleFunc("/api/webhook/inject/job", serveSidecarInjectionForJob)
+	mux.HandleFunc("/api/webhook/inject/test", serveSidecarInjectionForTest)
 	mux.HandleFunc("/api/webhook/test", serveTest)
 
 	whsvr := &http.Server{

@@ -16,7 +16,7 @@ spec:
         hypercloud4: webhook
     spec:
       nodeSelector:
-        kubernetes.io/hostname: $HOSTNAME
+        kubernetes.io/hostname: cho
       containers:
       - name: hypercloud4-webhook
         image: hypercloud-webhook:4.2

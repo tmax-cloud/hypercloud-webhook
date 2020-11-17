@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	util "hypercloud4-webhook/util"
-
 	jsonpatch "github.com/evanphx/json-patch"
 	"k8s.io/api/admission/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,18 +28,18 @@ func AddResourceMeta(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 	diff := Meta{}
 
 	if err := json.Unmarshal(ar.Request.Object.Raw, &ms); err != nil {
-		return util.ToAdmissionResponse(err) //msg: error
+		return ToAdmissionResponse(err) //msg: error
 	}
 
 	if len(ar.Request.OldObject.Raw) > 0 {
 		if err := json.Unmarshal(ar.Request.OldObject.Raw, &oms); err != nil {
-			return util.ToAdmissionResponse(err) //msg: error
+			return ToAdmissionResponse(err) //msg: error
 		}
 		if mergePatch, err := jsonpatch.CreateMergePatch(ar.Request.OldObject.Raw, ar.Request.Object.Raw); err != nil {
-			return util.ToAdmissionResponse(err) //msg: error
+			return ToAdmissionResponse(err) //msg: error
 		} else {
 			if err := json.Unmarshal(mergePatch, &diff); err != nil {
-				return util.ToAdmissionResponse(err) //msg: error
+				return ToAdmissionResponse(err) //msg: error
 			}
 		}
 	}
@@ -54,7 +52,7 @@ func AddResourceMeta(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		}
 	}
 
-	var patch []util.PatchOps
+	var patch []patchOps
 
 	if len(ms.Annotations) == 0 {
 		am := map[string]interface{}{
@@ -63,20 +61,20 @@ func AddResourceMeta(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 			"updater":     userName,
 			"updatedTime": currentTime,
 		}
-		util.CreatePatch(&patch, "add", "/metadata/annotations", am)
+		createPatch(&patch, "add", "/metadata/annotations", am)
 	} else {
 		if _, ok := ms.Annotations["creator"]; !ok {
-			util.CreatePatch(&patch, "add", "/metadata/annotations/creator", userName)
+			createPatch(&patch, "add", "/metadata/annotations/creator", userName)
 		}
 		if _, ok := ms.Annotations["createdTime"]; !ok {
-			util.CreatePatch(&patch, "add", "/metadata/annotations/createdTime", currentTime)
+			createPatch(&patch, "add", "/metadata/annotations/createdTime", currentTime)
 		}
-		util.CreatePatch(&patch, "add", "/metadata/annotations/updater", userName)
-		util.CreatePatch(&patch, "add", "/metadata/annotations/updatedTime", currentTime)
+		createPatch(&patch, "add", "/metadata/annotations/updater", userName)
+		createPatch(&patch, "add", "/metadata/annotations/updatedTime", currentTime)
 	}
 
 	if patchData, err := json.Marshal(patch); err != nil {
-		return util.ToAdmissionResponse(err) //msg: error
+		return ToAdmissionResponse(err) //msg: error
 	} else {
 		klog.Infof("JsonPatch=%s", string(patchData))
 		reviewResponse.Patch = patchData
