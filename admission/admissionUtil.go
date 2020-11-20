@@ -24,7 +24,6 @@ func createPatch(po *[]patchOps, o, p string, v interface{}) {
 }
 
 func ToAdmissionResponse(err error) *v1beta1.AdmissionResponse {
-
 	if err != nil {
 		return &v1beta1.AdmissionResponse{
 			Allowed: false,

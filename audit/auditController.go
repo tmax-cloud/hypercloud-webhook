@@ -83,7 +83,6 @@ L:
 	for i := 0; i < b.batchSize; i++ {
 		select {
 		case ev, ok := <-b.buffer:
-			// Buffer channel was closed and no new events will follow.
 			if !ok {
 				break L
 			}

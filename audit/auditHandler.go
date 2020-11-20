@@ -145,7 +145,7 @@ func queryBuilder(fc urlParam) string {
 	sort := fc.Sort
 
 	var b strings.Builder
-	b.WriteString("select SQL_CALC_FOUND_ROWS * from metering.audit where 1=1 ")
+	b.WriteString("select *, count(*) over() as full_count from audit where 1=1 ")
 
 	if startTime != "" && endTime != "" {
 		b.WriteString("and stagetimestamp between '")

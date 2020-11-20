@@ -423,7 +423,6 @@ func InjectionForTest(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 	if err := json.Unmarshal(ar.Request.Object.Raw, &deploy); err != nil {
 		return ToAdmissionResponse(err)
 	}
-	klog.Info("validate: ")
 	klog.Info(string(ar.Request.Object.Raw))
 
 	reviewResponse.Allowed = true

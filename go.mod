@@ -9,9 +9,11 @@ require (
 	github.com/golang-collections/go-datastructures v0.0.0-20150211160725-59788d5eb259
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/websocket v1.4.2
+	github.com/lib/pq v1.8.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	k8s.io/api v0.18.8
 	k8s.io/apimachinery v0.18.8
 	k8s.io/apiserver v0.18.8
+	k8s.io/client-go v0.18.8
 	k8s.io/klog v1.0.0
 )

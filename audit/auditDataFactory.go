@@ -2,33 +2,62 @@ package audit
 
 import (
 	"database/sql"
-	"strings"
+	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
+	pq "github.com/lib/pq"
+
+	// _ "github.com/go-sql-driver/mysql"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/apis/audit"
 	"k8s.io/klog"
 )
 
 const (
-	AUDIT_INSERT_QUERY       = "insert into metering.audit values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	AUDIT_INSERT_QUERY_BATCH = "insert into metering.audit values"
-	PARAMETER                = "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	AUDIT_FOUND_ROWS_QUERY   = "SELECT FOUND_ROWS() as count"
+	// AUDIT_INSERT_QUERY       = "insert into metering.audit values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	// AUDIT_INSERT_QUERY_BATCH = "insert into metering.audit values"
+	// PARAMETER                = "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	// AUDIT_FOUND_ROWS_QUERY   = "SELECT FOUND_ROWS() as count"
+	// AUDIT_INSERT_QUERY       = "insert into audit values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	// AUDIT_INSERT_QUERY_BATCH = "insert into metering.audit values"
+	// PARAMETER                = "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+	// AUDIT_FOUND_ROWS_QUERY   = "SELECT FOUND_ROWS() as count"
+
+	DB_USER     = "audit"
+	DB_PASSWORD = "tmax"
+	DB_NAME     = "audit"
+	HOSTNAME    = "postgres-service.hypercloud4-system.svc"
+	PORT        = 5432
 )
 
+var pg_con_info string
+
+func init() {
+	pg_con_info = fmt.Sprintf("port=%d host=%s user=%s "+
+		"password=%s dbname=%s sslmode=disable",
+		PORT, HOSTNAME, DB_USER, DB_PASSWORD, DB_NAME)
+}
+
 func insert(items []audit.Event) {
-	db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
+	db, err := sql.Open("postgres", pg_con_info)
+	// db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
 	if err != nil {
 		klog.Error(err)
 	}
 	defer db.Close()
 
-	var paramArray []string
-	vals := []interface{}{}
+	txn, err := db.Begin()
+	if err != nil {
+		klog.Error(err)
+	}
+
+	stmt, err := txn.Prepare(pq.CopyIn("audit", "id", "username", "useragent", "namespace", "apigroup", "apiversion", "resource", "name",
+		"stage", "stagetimestamp", "verb", "code", "status", "reason", "message"))
+	if err != nil {
+		klog.Error(err)
+	}
+
 	for _, event := range items {
-		paramArray = append(paramArray, PARAMETER)
-		vals = append(vals, event.AuditID,
+		_, err = stmt.Exec(event.AuditID,
 			event.User.Username,
 			event.UserAgent,
 			event.ObjectRef.Namespace,
@@ -43,18 +72,24 @@ func insert(items []audit.Event) {
 			event.ResponseStatus.Status,
 			event.ResponseStatus.Reason,
 			event.ResponseStatus.Message)
-	}
-	query := AUDIT_INSERT_QUERY_BATCH + strings.Join(paramArray, ",")
 
-	stmt, err := db.Prepare(query)
-	if err != nil {
-		klog.Info(err)
+		if err != nil {
+			klog.Error(err)
+		}
 	}
-	defer stmt.Close()
-
-	res, err := stmt.Exec(vals...)
+	res, err := stmt.Exec()
 	if err != nil {
-		klog.Info(err)
+		klog.Error(err)
+	}
+
+	err = stmt.Close()
+	if err != nil {
+		klog.Error(err)
+	}
+
+	err = txn.Commit()
+	if err != nil {
+		klog.Error(err)
 	}
 
 	if count, err := res.RowsAffected(); err != nil {
@@ -65,19 +100,21 @@ func insert(items []audit.Event) {
 }
 
 func get(query string) (audit.EventList, int64) {
-	db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
+	db, err := sql.Open("postgres", pg_con_info)
+	// db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
 	if err != nil {
 		klog.Error(err)
 	}
 	defer db.Close()
 
-	tx, err := db.Begin()
+	rows, err := db.Query(query)
 	if err != nil {
 		klog.Error(err)
 	}
+	defer rows.Close()
 
-	rows, err := tx.Query(query)
 	eventList := audit.EventList{}
+	var row_count int64
 	for rows.Next() {
 		event := audit.Event{
 			ObjectRef:      &audit.ObjectReference{},
@@ -98,7 +135,8 @@ func get(query string) (audit.EventList, int64) {
 			&event.ResponseStatus.Code,
 			&event.ResponseStatus.Status,
 			&event.ResponseStatus.Reason,
-			&event.ResponseStatus.Message)
+			&event.ResponseStatus.Message,
+			&row_count)
 		if err != nil {
 			rows.Close()
 			klog.Error(err)
@@ -109,39 +147,5 @@ func get(query string) (audit.EventList, int64) {
 	eventList.Kind = "EventList"
 	eventList.APIVersion = "audit.k8s.io/v1"
 
-	if err != nil {
-		tx.Rollback()
-		rows.Close()
-		klog.Error(err)
-	}
-	defer rows.Close()
-
-	var count int64
-	err = tx.QueryRow("SELECT FOUND_ROWS() as Count").Scan(&count)
-
-	if err != nil {
-		tx.Rollback()
-		rows.Close()
-		klog.Error(err)
-	}
-	return eventList, count
-}
-
-func getRowsCount() int64 {
-	db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
-	if err != nil {
-		klog.Error(err)
-	}
-	defer db.Close()
-
-	var rowsCount int64
-	err = db.QueryRow(AUDIT_FOUND_ROWS_QUERY).Scan(&rowsCount)
-	if err != nil {
-		klog.Error(err)
-	}
-
-	klog.Info("query: ", AUDIT_FOUND_ROWS_QUERY)
-	klog.Infof("rowsCount %d", rowsCount)
-
-	return rowsCount
+	return eventList, row_count
 }
