@@ -1,6 +1,22 @@
 # HyperCloudWebhookServer changelog!!
 All notable changes to this project will be documented in this file.
 
+<!-------------------- v4.1.0.31 start -------------------->
+
+## HyperCloudWebhookServer_4.1.0.31 (Thu Dec 10 07:31:05 KST 2020)
+
+### Added
+
+### Changed
+
+### Fixed
+  - [ims][246451] API 요청마다 DB connection 생성하도록 수정 by cho
+
+### Etc
+  - [etc] add manifest by cho
+
+<!--------------------- v4.1.0.31 end --------------------->
+
 <!-------------------- v4.1.0.30 start -------------------->
 
 ## HyperCloudWebhookServer_4.1.0.30 (Mon Oct 26 06:38:37 KST 2020)
