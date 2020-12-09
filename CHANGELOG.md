@@ -1,6 +1,21 @@
 # HyperCloudWebhookServer changelog!!
 All notable changes to this project will be documented in this file.
 
+<!-------------------- v4.1.0.32 start -------------------->
+
+## HyperCloudWebhookServer_4.1.0.32 (Thu Dec 10 07:52:38 KST 2020)
+
+### Added
+  - [feat] status 필터링 추가 by cho
+
+### Changed
+
+### Fixed
+
+### Etc
+
+<!--------------------- v4.1.0.32 end --------------------->
+
 <!-------------------- v4.1.0.31 start -------------------->
 
 ## HyperCloudWebhookServer_4.1.0.31 (Thu Dec 10 07:31:05 KST 2020)
