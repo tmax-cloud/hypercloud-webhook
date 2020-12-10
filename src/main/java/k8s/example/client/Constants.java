@@ -45,7 +45,7 @@ public class Constants {
 	
 	// Mysql DB Connection
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	public static final String DB_URL = "jdbc:mysql://mysql-service.hypercloud4-system:3306/metering?useSSL=false";
+	public static final String DB_URL = "jdbc:mysql://mysql-service.hypercloud4-system.svc:3306/metering?useSSL=false";
 	public static final String USERNAME = "root";
 	
 	

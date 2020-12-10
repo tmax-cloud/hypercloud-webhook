@@ -26,18 +26,6 @@ public class AuditWorkerThread extends Thread {
 			
 			while(true) {
 				List<Event> eventList = queue.takeAll();
-				for(Event event: eventList) {
-					ResponseStatus responseStatus = event.getResponseStatus();
-				 	if((responseStatus.getCode() / 100) == 2  && responseStatus.getStatus() == null) {
-				 		responseStatus.setStatus("Success");
-				 	}
-				 	if((responseStatus.getCode() / 100) == 4  && responseStatus.getStatus() == null) {
-				 		responseStatus.setStatus("Failure");
-				 	}
-				 	if((responseStatus.getCode() / 100) == 5  && responseStatus.getStatus() == null) {
-				 		responseStatus.setStatus("Failure");
-				 	}
-				}
 				AuditDataFactory.insert(eventList);
 			}
 			

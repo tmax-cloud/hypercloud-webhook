@@ -24,6 +24,7 @@ import k8s.example.client.audit.AuditDataObject.DateTimeFormatModule;
 import k8s.example.client.audit.AuditDataObject.DateTimeSerializer;
 import k8s.example.client.audit.AuditDataObject.Event;
 import k8s.example.client.audit.AuditDataObject.EventList;
+import k8s.example.client.audit.AuditDataObject.ResponseStatus;
 import k8s.example.client.util.StringUtil;
 import k8s.example.client.audit.EventQueue;
 
@@ -48,6 +49,16 @@ public class AuditHandler extends GeneralHandler{
 			List<Event> listevent = eventList.getItems();
 			logger.info("Check event list size, size=" + listevent.size());
 			for(Event event : listevent) {
+				ResponseStatus responseStatus = event.getResponseStatus();
+			 	if((responseStatus.getCode() / 100) == 2  && responseStatus.getStatus() == null) {
+			 		responseStatus.setStatus("Success");
+			 	}
+			 	if((responseStatus.getCode() / 100) == 4  && responseStatus.getStatus() == null) {
+			 		responseStatus.setStatus("Failure");
+			 	}
+			 	if((responseStatus.getCode() / 100) == 5  && responseStatus.getStatus() == null) {
+			 		responseStatus.setStatus("Failure");
+			 	}
 				queue.put(event);
 			}
 			
@@ -67,11 +78,14 @@ public class AuditHandler extends GeneralHandler{
 		try {
 			outdto.setKind("EventList");
 			outdto.setApiVersion("audit.k8s.io/v1");
-			outdto.setItems(AuditDataFactory.select(session.getParameters()));
-			outdto.setTotalNum(AuditDataFactory.selectCnt());
+//			resultAuditDataFactory.select(session.getParameters())
+			EventList tmp = new EventList();
+			tmp = AuditDataFactory.select(session.getParameters());
+			outdto.setItems(tmp.getItems());
+			outdto.setTotalNum(tmp.getTotalNum());
 		} catch (Exception e) {
 			logger.error("Failed to get event data. \n" + Util.printExceptionError(e));
-			return NanoHTTPD.newFixedLengthResponse(Status.INTERNAL_ERROR, getMimeType(), "Failed to put data on the queue.");
+			return NanoHTTPD.newFixedLengthResponse(Status.INTERNAL_ERROR, getMimeType(), "Failed to get data.");
 		}
 		return NanoHTTPD.newFixedLengthResponse(Status.CREATED, getMimeType(), gson.toJson(outdto));
 	}
@@ -80,6 +94,4 @@ public class AuditHandler extends GeneralHandler{
     public String getMimeType() {
         return "application/json";
     }
-	
-
 }
