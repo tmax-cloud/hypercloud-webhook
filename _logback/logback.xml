@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOGS_ABSOLUTE_PATH" value="${K8S_HOME}/logs" />
+
+	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+	
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy.MM.dd HH:mm:ss}] [%thread] [%level] [%logger{35}] %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="WEBHOOK" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_ABSOLUTE_PATH}/webhook.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        	<level>INFO</level>
+    	</filter>
+        <encoder>
+            <pattern>[%d{yyyy.MM.dd HH:mm:ss}] [%thread] [%level] [%logger{35}] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/webhook_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>20MB</maxFileSize>
+                <!-- kb, mb, gb -->
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="WEBHOOK_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_ABSOLUTE_PATH}/debug/webhook_debug.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        	<level>DEBUG</level>
+    	</filter>
+        <encoder>
+            <pattern>[%d{yyyy.MM.dd HH:mm:ss}] [%thread] [%level] [%logger{35}] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/debug/webhook_debug_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>20MB</maxFileSize>
+                <!-- kb, mb, gb -->
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    
+    <appender name="AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_ABSOLUTE_PATH}/audit.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>[%d{yyyy.MM.dd HH:mm:ss}] [%thread] [%level] [%logger{35}] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/audit_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>20MB</maxFileSize>
+                <!-- kb, mb, gb -->
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="AUDIT_DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_ABSOLUTE_PATH}/debug/audit_debug.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>DEBUG</level>
+        </filter>
+        <encoder>
+            <pattern>[%d{yyyy.MM.dd HH:mm:ss}] [%thread] [%level] [%logger{35}] %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOGS_ABSOLUTE_PATH}/debug/audit_debug_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 100MB -->
+                <maxFileSize>20MB</maxFileSize>
+                <!-- kb, mb, gb -->
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="Webhook" level="ALL">
+        <appender-ref ref="WEBHOOK"/>
+        <appender-ref ref="WEBHOOK_DEBUG"/>
+    </logger>
+	    <logger name="Audit" level="ALL">
+        <appender-ref ref="AUDIT"/>
+        <appender-ref ref="AUDIT_DEBUG"/>
+    </logger>
+    
+</configuration>
