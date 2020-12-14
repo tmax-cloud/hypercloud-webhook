@@ -8,6 +8,8 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 
+	"hypercloud4-webhook/util"
+
 	batchv1 "k8s.io/api/batch/v1"
 	batchv1beta1 "k8s.io/api/batch/v1beta1"
 	"k8s.io/klog"
@@ -23,10 +25,6 @@ func InjectionForPod(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// if isSystemRequest(ar.Request.UserInfo) {
-	// 	return ToAdmissionResponse(nil)
-	// }
-
 	var configName string
 	if val, exist := pod.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -36,12 +34,11 @@ func InjectionForPod(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 	var logRootPath string
-	if val, exist := pod.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(pod.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := pod.Spec.Containers
@@ -79,10 +76,6 @@ func InjectionForDeploy(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// if isSystemRequest(ar.Request.UserInfo) {
-	// 	return ToAdmissionResponse(nil)
-	// }
-
 	var configName string
 	if val, exist := deploy.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -92,12 +85,11 @@ func InjectionForDeploy(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(errors.New("Log collector configuration is empty."))
 	}
 	var logRootPath string
-	if val, exist := deploy.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(deploy.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := deploy.Spec.Template.Spec.Containers
@@ -135,12 +127,6 @@ func InjectionForRs(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// klog.Info(string(ar.Request.Object.Raw))
-
-	if isSystemRequest(ar.Request.UserInfo) {
-		return ToAdmissionResponse(nil)
-	}
-
 	var configName string
 	if val, exist := rs.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -150,12 +136,11 @@ func InjectionForRs(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 	var logRootPath string
-	if val, exist := rs.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(rs.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := rs.Spec.Template.Spec.Containers
@@ -193,12 +178,6 @@ func InjectionForSts(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// klog.Info(string(ar.Request.Object.Raw))
-
-	if isSystemRequest(ar.Request.UserInfo) {
-		return ToAdmissionResponse(nil)
-	}
-
 	var configName string
 	if val, exist := sts.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -208,12 +187,11 @@ func InjectionForSts(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 	var logRootPath string
-	if val, exist := sts.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(sts.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := sts.Spec.Template.Spec.Containers
@@ -251,12 +229,6 @@ func InjectionForDs(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// klog.Info(string(ar.Request.Object.Raw))
-
-	if isSystemRequest(ar.Request.UserInfo) {
-		return ToAdmissionResponse(nil)
-	}
-
 	var configName string
 	if val, exist := ds.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -266,12 +238,11 @@ func InjectionForDs(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 	var logRootPath string
-	if val, exist := ds.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(ds.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := ds.Spec.Template.Spec.Containers
@@ -309,12 +280,6 @@ func InjectionForCj(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// klog.Info(string(ar.Request.Object.Raw))
-
-	if isSystemRequest(ar.Request.UserInfo) {
-		return ToAdmissionResponse(nil)
-	}
-
 	var configName string
 	if val, exist := cj.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -324,12 +289,11 @@ func InjectionForCj(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 	var logRootPath string
-	if val, exist := cj.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(cj.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := cj.Spec.JobTemplate.Spec.Template.Spec.Containers
@@ -367,12 +331,6 @@ func InjectionForJob(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 
-	// klog.Info(string(ar.Request.Object.Raw))
-
-	if isSystemRequest(ar.Request.UserInfo) {
-		return ToAdmissionResponse(nil)
-	}
-
 	var configName string
 	if val, exist := job.Labels["tmax.io/log-collector-configuration"]; exist {
 		configName = val
@@ -382,12 +340,11 @@ func InjectionForJob(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 		return ToAdmissionResponse(err)
 	}
 	var logRootPath string
-	if val, exist := job.Annotations["tmax.io/log-root-path"]; exist {
-		logRootPath = val
-	} else {
-		err := errors.New("Log root path is empty.")
+	if res, err := util.GetLogv1(job.GetNamespace(), configName); err != nil {
 		klog.Error(err)
 		return ToAdmissionResponse(err)
+	} else {
+		logRootPath = res.Status.LogRootPath
 	}
 
 	oldContainerList := job.Spec.Template.Spec.Containers
@@ -423,6 +380,7 @@ func InjectionForTest(ar v1beta1.AdmissionReview) *v1beta1.AdmissionResponse {
 	if err := json.Unmarshal(ar.Request.Object.Raw, &deploy); err != nil {
 		return ToAdmissionResponse(err)
 	}
+
 	klog.Info(string(ar.Request.Object.Raw))
 
 	reviewResponse.Allowed = true

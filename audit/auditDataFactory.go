@@ -5,23 +5,12 @@ import (
 	"fmt"
 
 	pq "github.com/lib/pq"
-
-	// _ "github.com/go-sql-driver/mysql"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/apis/audit"
 	"k8s.io/klog"
 )
 
 const (
-	// AUDIT_INSERT_QUERY       = "insert into metering.audit values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	// AUDIT_INSERT_QUERY_BATCH = "insert into metering.audit values"
-	// PARAMETER                = "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	// AUDIT_FOUND_ROWS_QUERY   = "SELECT FOUND_ROWS() as count"
-	// AUDIT_INSERT_QUERY       = "insert into audit values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	// AUDIT_INSERT_QUERY_BATCH = "insert into metering.audit values"
-	// PARAMETER                = "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-	// AUDIT_FOUND_ROWS_QUERY   = "SELECT FOUND_ROWS() as count"
-
 	DB_USER     = "audit"
 	DB_PASSWORD = "tmax"
 	DB_NAME     = "audit"
@@ -39,7 +28,6 @@ func init() {
 
 func insert(items []audit.Event) {
 	db, err := sql.Open("postgres", pg_con_info)
-	// db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
 	if err != nil {
 		klog.Error(err)
 	}
@@ -101,7 +89,6 @@ func insert(items []audit.Event) {
 
 func get(query string) (audit.EventList, int64) {
 	db, err := sql.Open("postgres", pg_con_info)
-	// db, err := sql.Open("mysql", "root:tmax@tcp(mysql-service.hypercloud4-system.svc:3306)/metering?parseTime=true")
 	if err != nil {
 		klog.Error(err)
 	}

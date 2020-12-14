@@ -14,10 +14,11 @@ import (
 
 	"k8s.io/klog"
 
-	"k8s.io/api/admission/v1beta1"
-
 	admission "hypercloud4-webhook/admission"
+
 	audit "hypercloud4-webhook/audit"
+
+	"k8s.io/api/admission/v1beta1"
 )
 
 type admitFunc func(v1beta1.AdmissionReview) *v1beta1.AdmissionResponse
@@ -67,31 +68,6 @@ func serveMetadata(w http.ResponseWriter, r *http.Request) {
 	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
 	serve(w, r, admission.AddResourceMeta)
 }
-
-func serveAudit(w http.ResponseWriter, r *http.Request) {
-	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
-	switch r.Method {
-	case http.MethodGet:
-		audit.GetAudit(w, r)
-	case http.MethodPost:
-		audit.AddAudit(w, r)
-	case http.MethodPut:
-	case http.MethodDelete:
-	default:
-		//error
-	}
-}
-
-func serveAuditBatch(w http.ResponseWriter, r *http.Request) {
-	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
-	audit.AddAuditBatch(w, r)
-}
-
-func serveAuditWss(w http.ResponseWriter, r *http.Request) {
-	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
-	audit.ServeWss(w, r)
-}
-
 func serveSidecarInjectionForPod(w http.ResponseWriter, r *http.Request) {
 	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
 	serve(w, r, admission.InjectionForPod)
@@ -124,7 +100,6 @@ func serveSidecarInjectionForTest(w http.ResponseWriter, r *http.Request) {
 	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
 	serve(w, r, admission.InjectionForTest)
 }
-
 func serveTest(w http.ResponseWriter, r *http.Request) {
 	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
 	var body []byte
@@ -134,6 +109,30 @@ func serveTest(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	klog.Info("Request body: \n", string(body))
+}
+
+func serveAudit(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	switch r.Method {
+	case http.MethodGet:
+		audit.GetAudit(w, r)
+	case http.MethodPost:
+		audit.AddAudit(w, r)
+	case http.MethodPut:
+	case http.MethodDelete:
+	default:
+		//error
+	}
+}
+
+func serveAuditBatch(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	audit.AddAuditBatch(w, r)
+}
+
+func serveAuditWss(w http.ResponseWriter, r *http.Request) {
+	klog.Infof("Http request: method=%s, uri=%s", r.Method, r.URL.Path)
+	audit.ServeWss(w, r)
 }
 
 var (
