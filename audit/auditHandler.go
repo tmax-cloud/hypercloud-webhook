@@ -11,7 +11,6 @@ import (
 
 	"hypercloud4-webhook/util"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	types "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apiserver/pkg/apis/audit"
@@ -112,13 +111,8 @@ func GetAudit(w http.ResponseWriter, r *http.Request) {
 	urlParam.Code = r.URL.Query().Get("code")
 	urlParam.Verb = r.URL.Query().Get("verb")
 	urlParam.Sort = r.URL.Query()["sort"]
-
-	if r.URL.Query().Get("startTime") != "" && r.URL.Query().Get("endTime") != "" {
-		sn, _ := strconv.ParseInt(r.URL.Query().Get("startTime"), 10, 64)
-		en, _ := strconv.ParseInt(r.URL.Query().Get("endTime"), 10, 64)
-		urlParam.StartTime = time.Unix(sn, 0).UTC().String()
-		urlParam.EndTime = time.Unix(en, 0).UTC().String()
-	}
+	urlParam.StartTime = r.URL.Query().Get("startTime")
+	urlParam.EndTime = r.URL.Query().Get("endTime")
 
 	query := queryBuilder(urlParam)
 
@@ -132,27 +126,27 @@ func GetAudit(w http.ResponseWriter, r *http.Request) {
 	util.SetResponse(w, "", response, http.StatusOK)
 }
 
-func queryBuilder(fc urlParam) string {
+func queryBuilder(param urlParam) string {
 
-	namespace := fc.Namespace
-	resource := fc.Resource
-	startTime := fc.StartTime
-	endTime := fc.EndTime
-	limit := fc.Limit
-	offset := fc.Offset
-	code := fc.Code
-	verb := fc.Verb
-	sort := fc.Sort
+	namespace := param.Namespace
+	resource := param.Resource
+	startTime := param.StartTime
+	endTime := param.EndTime
+	limit := param.Limit
+	offset := param.Offset
+	code := param.Code
+	verb := param.Verb
+	sort := param.Sort
 
 	var b strings.Builder
 	b.WriteString("select *, count(*) over() as full_count from audit where 1=1 ")
 
 	if startTime != "" && endTime != "" {
-		b.WriteString("and stagetimestamp between '")
+		b.WriteString("and stagetimestamp between to_timestamp(")
 		b.WriteString(startTime)
-		b.WriteString("' and '")
+		b.WriteString(") and to_timestamp(")
 		b.WriteString(endTime)
-		b.WriteString("' ")
+		b.WriteString(") ")
 	}
 
 	if namespace != "" {

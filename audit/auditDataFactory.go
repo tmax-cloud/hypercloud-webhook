@@ -128,7 +128,6 @@ func get(query string) (audit.EventList, int64) {
 			rows.Close()
 			klog.Error(err)
 		}
-		event.StageTimestamp.Time = event.StageTimestamp.Time.Local()
 		eventList.Items = append(eventList.Items, event)
 	}
 	eventList.Kind = "EventList"
