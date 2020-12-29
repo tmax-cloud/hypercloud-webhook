@@ -26,6 +26,7 @@ type urlParam struct {
 	Offset    string   `json:"offset"`
 	Code      string   `json:"code"`
 	Verb      string   `json:"verb"`
+	Status    string   `json:"status"`
 	Sort      []string `json:"sort"`
 }
 
@@ -113,6 +114,7 @@ func GetAudit(w http.ResponseWriter, r *http.Request) {
 	urlParam.Sort = r.URL.Query()["sort"]
 	urlParam.StartTime = r.URL.Query().Get("startTime")
 	urlParam.EndTime = r.URL.Query().Get("endTime")
+	urlParam.Status = r.URL.Query().Get("status")
 
 	query := queryBuilder(urlParam)
 
@@ -137,6 +139,7 @@ func queryBuilder(param urlParam) string {
 	code := param.Code
 	verb := param.Verb
 	sort := param.Sort
+	status := param.Status
 
 	var b strings.Builder
 	b.WriteString("select *, count(*) over() as full_count from audit where 1=1 ")
@@ -158,6 +161,12 @@ func queryBuilder(param urlParam) string {
 	if resource != "" {
 		b.WriteString("and resource = '")
 		b.WriteString(resource)
+		b.WriteString("' ")
+	}
+
+	if status != "" {
+		b.WriteString("and status = '")
+		b.WriteString(status)
 		b.WriteString("' ")
 	}
 
