@@ -6,16 +6,24 @@ webhooks:
   - name: hypercloud4-webhook.mutating.metadata
     clientConfig:
       service:
-        name: hypercloud4-webhook-svc
-        namespace: hypercloud4-system
+        name: hypercloud-webhook-svc
+        namespace: hypercloud5-system
         path: "/api/webhook/metadata"
         port: 443
       caBundle: ${HYPERCLOUD4_CA_CERT}
     rules:
       - operations: ["CREATE","UPDATE"]
-        apiGroups: [""]
+        apiGroups: ["claims.tmax.io"]
+        apiVersions: ["v1alpha1"]
+        resources: ["*"]
+      - operations: ["CREATE","UPDATE"]
+        apiGroups: ["cluster.tmax.io"]
+        apiVersions: ["v1alpha1"]
+        resources: ["*"]
+      - operations: ["CREATE","UPDATE"]
+        apiGroups: ["tmax.io"]
         apiVersions: ["v1"]
-        resources: ["configmaps"]
+        resources: ["*"]
     matchPolicy: Equivalent
     sideEffects: None
     admissionReviewVersions: ["v1beta1"]
@@ -26,27 +34,3 @@ webhooks:
         operator: NotIn 
         values: ["false"]
     failurePolicy: Fail
-  - name: hypercloud4-webhook-svc.hypercloud4-system.svc.injection
-    clientConfig:
-      service:
-        name: hypercloud4-webhook-svc
-        namespace: hypercloud4-system
-        path: "/api/webhook/injection"
-        port: 443 
-      caBundle: ${HYPERCLOUD4_CA_CERT}
-    rules:
-      - operations: ["CREATE"]
-        apiGroups: [""]
-        apiVersions: ["v1"]
-        resources: ["pods"]
-    matchPolicy: Equivalent
-    sideEffects: None
-    admissionReviewVersions: ["v1beta1"]
-    timeoutSeconds: 10
-    namespaceSelector:
-      matchExpressions:
-      - key: webhook
-        operator: NotIn 
-        values: ["false"]
-    failurePolicy: Fail
-

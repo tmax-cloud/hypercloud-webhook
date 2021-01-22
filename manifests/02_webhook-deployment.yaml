@@ -1,25 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hypercloud4-webhook
-  namespace: hypercloud4-system
+  name: hypercloud-webhook
+  namespace: hypercloud5-system
   labels:
-    hypercloud4: webhook
+    hypercloud: webhook
 spec:
   replicas: 1
   selector:
     matchLabels:
-      hypercloud4: webhook
+      hypercloud: webhook
   template:
     metadata:
       labels:
-        hypercloud4: webhook
+        hypercloud: webhook
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: cho
       containers:
-      - name: hypercloud4-webhook
-        image: hypercloud-webhook:4.2
+      - name: hypercloud-webhook
+        image: tmaxcloudck/hypercloud-webhook:b5.0.2.1
         imagePullPolicy: IfNotPresent
         resources:
           requests:
@@ -37,24 +35,24 @@ spec:
         - containerPort: 8443
           name: webhook 
         volumeMounts:
-        - name: hypercloud4-webhook-certs
+        - name: hypercloud-webhook-certs
           mountPath: /run/secrets/tls
           readOnly: true
       volumes:
-      - name: hypercloud4-webhook-certs
+      - name: hypercloud-webhook-certs
         secret:
-          secretName: hypercloud4-webhook-certs
-        name: hypercloud4-webhook-certs
+          secretName: hypercloud-webhook-certs
+        name: hypercloud-webhook-certs
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: hypercloud4-webhook-svc
-  namespace: hypercloud4-system
+  name: hypercloud-webhook-svc
+  namespace: hypercloud5-system
 spec:
   type: NodePort
   selector:
-    hypercloud4: webhook
+    hypercloud: webhook
   ports:
     - port: 443
       targetPort: webhook
