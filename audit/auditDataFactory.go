@@ -14,7 +14,7 @@ const (
 	DB_USER     = "audit"
 	DB_PASSWORD = "tmax"
 	DB_NAME     = "audit"
-	HOSTNAME    = "postgres-service.hypercloud4-system.svc"
+	HOSTNAME    = "postgres-service.hypercloud5-system.svc"
 	PORT        = 5432
 )
 
