@@ -1,6 +1,21 @@
 # HyperCloudWebhookServer changelog!!
 All notable changes to this project will be documented in this file.
 
+<!-------------------- v4.1.0.33 start -------------------->
+
+## HyperCloudWebhookServer_4.1.0.33 (Wed Apr  7 07:15:40 KST 2021)
+
+### Added
+
+### Changed
+  - [mod] modify query string action to verb by chosangwon93
+
+### Fixed
+
+### Etc
+
+<!--------------------- v4.1.0.33 end --------------------->
+
 <!-------------------- v4.1.0.32 start -------------------->
 
 ## HyperCloudWebhookServer_4.1.0.32 (Thu Dec 10 07:52:38 KST 2020)
