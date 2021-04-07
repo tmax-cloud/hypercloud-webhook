@@ -41,7 +41,7 @@ public class Constants {
 	public static final String QUERY_PARAMETER_SORT = "sort";
 	public static final String QUERY_PARAMETER_RESOURCE = "resource";
 	public static final String QUERY_PARAMETER_CODE = "code";
-	public static final String QUERY_PARAMETER_ACTION = "action";
+	public static final String QUERY_PARAMETER_ACTION = "verb";
 	public static final String QUERY_PARAMETER_STATUS = "status";
 	
 	// Mysql DB Connection

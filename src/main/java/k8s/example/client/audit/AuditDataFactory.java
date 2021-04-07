@@ -199,6 +199,7 @@ public class AuditDataFactory {
 			}
 			pstmt.close();
 			pstmt = new LogPreparedStatement(conn, AUDIT_SELECT_CNT_QUERY);
+			logger.debug("Query=\"" + pstmt.getQueryString() + "\"");
 			try(ResultSet rs = pstmt.executeQuery()) {
 				rs.next();
 				rowCounts = rs.getLong("FOUND_ROWS()");
@@ -208,12 +209,14 @@ public class AuditDataFactory {
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
+			logger.error("error: " +  e);
 		} finally {
 			try {
 				if(conn != null) conn.close();
 				if(pstmt != null) pstmt.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
+				logger.error("error: " +  e);
 		}
 	}
 		return outdto;
